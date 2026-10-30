@@ -1,4 +1,4 @@
-import 'dotenv/config';
+import '../config/env';
 import * as fs from 'fs';
 import * as path from 'path';
 import db from './database';

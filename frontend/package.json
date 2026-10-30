@@ -8,26 +8,30 @@
         "dev": "vite",
         "start": "vite",
         "build": "tsc && vite build",
+        "typecheck": "tsc",
         "preview": "vite preview"
     },
     "license": "ISC",
+    "engines": {
+        "node": ">=26.13.0"
+    },
     "dependencies": {
-        "@fortawesome/fontawesome-svg-core": "^6.7.2",
-        "@fortawesome/free-solid-svg-icons": "^6.7.2",
-        "@fortawesome/react-fontawesome": "^0.2.2",
-        "axios": "^1.10.0",
-        "bootstrap": "^5.3.7",
-        "react": "^19.1.0",
+        "@fortawesome/fontawesome-svg-core": "^7.3.1",
+        "@fortawesome/free-solid-svg-icons": "^7.3.1",
+        "@fortawesome/react-fontawesome": "^3.5.0",
+        "axios": "^1.21.0",
+        "bootstrap": "^5.3.8",
+        "react": "^19.3.1",
         "react-bootstrap": "^2.10.10",
-        "react-dom": "^19.1.0",
-        "react-router-dom": "^7.6.2"
+        "react-dom": "^19.3.1",
+        "react-router-dom": "^7.18.5"
     },
     "devDependencies": {
-        "@types/node": "^22.15.0",
-        "@types/react": "^19.1.8",
-        "@types/react-dom": "^19.1.6",
-        "@vitejs/plugin-react": "^4.5.2",
-        "typescript": "^5.8.3",
-        "vite": "^6.3.5"
+        "@types/node": "^26.6.6",
+        "@types/react": "^19.3.0",
+        "@types/react-dom": "^19.3.0",
+        "@vitejs/plugin-react": "^6.1.2",
+        "typescript": "^7.0.2",
+        "vite": "^8.3.5"
     }
 }

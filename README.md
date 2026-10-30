@@ -8,10 +8,10 @@ Os requisitos funcionais do sistema web, extraídos do documento do projeto de e
 
 | Camada    | Tecnologias |
 |-----------|-------------|
-| Backend   | Node.js 22, Express 4, TypeScript, pg-promise, Passport JWT, bcryptjs |
-| Frontend  | React 19, Vite 6, TypeScript, React Bootstrap 5, React Router 7, axios, Font Awesome |
+| Backend   | Node.js 26 LTS, Express 5, TypeScript 7, pg-promise 12, Passport JWT, bcryptjs, tsx (dev) |
+| Frontend  | React 19, Vite 8, TypeScript 7, React Bootstrap 2 (Bootstrap 5), React Router 7, axios, Font Awesome 7 |
 | Banco     | PostgreSQL 17 |
-| Infra     | Docker / Docker Compose, Nginx (frontend em produção) |
+| Infra     | Docker / Docker Compose, Nginx 1.30 (frontend em produção) |
 
 ## Estrutura
 
@@ -57,7 +57,7 @@ docker compose -f docker-compose.dev.yml up --build
 ```
 
 - Frontend: http://localhost:3001 (Vite, recarrega ao salvar)
-- API: http://localhost:3002 (ts-node-dev, reinicia ao salvar)
+- API: http://localhost:3002 (tsx watch, reinicia ao salvar)
 - Banco: `localhost:5433` (usuário `postgres`, senha `postgres`, banco `horto`)
 
 O código de `backend/` e `frontend/` é montado dentro dos containers. Se alterar algum `package.json`, suba novamente com `--build -V` para reinstalar as dependências.
@@ -94,7 +94,7 @@ Todas têm valor padrão para desenvolvimento. Para alterar, copie `.env.example
 
 ### Sem Docker (opcional)
 
-É possível rodar backend e frontend direto na máquina (Node 22 + Yarn 1), mantendo só o banco no Docker:
+É possível rodar backend e frontend direto na máquina (Node 26.13.0 + Yarn 1 — no Node 26 o Yarn não vem incluso: `npm install -g yarn@1.22.22`), mantendo só o banco no Docker:
 
 ```bash
 docker compose -f docker-compose.dev.yml up -d db

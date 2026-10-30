@@ -28,6 +28,7 @@ services:
     build:
       context: ./backend
       target: dev
+    image: horto-web-backend:dev # nome próprio para não reaproveitar a imagem de produção
     container_name: horto-backend
     environment:
       DB_HOST: db
@@ -52,6 +53,7 @@ services:
     build:
       context: ./frontend
       target: dev
+    image: horto-web-frontend:dev # nome próprio para não reaproveitar a imagem de produção
     container_name: horto-frontend
     environment:
       VITE_PROXY_TARGET: http://backend:3002

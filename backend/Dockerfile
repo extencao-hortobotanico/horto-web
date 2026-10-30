@@ -1,6 +1,9 @@
 # ── Base: dependências ────────────────────────────────────────────────────────
-FROM node:22-alpine AS deps
+FROM node:26.13.0-alpine AS deps
 WORKDIR /app
+
+# A imagem do Node 26 não traz o Yarn: instala o Yarn 1 com versão fixa
+RUN npm install -g yarn@1.22.22 && npm cache clean --force
 
 COPY package.json yarn.lock ./
 RUN yarn install --frozen-lockfile
@@ -17,13 +20,16 @@ COPY . .
 RUN yarn build
 
 # ── Runtime (alvo padrão) ─────────────────────────────────────────────────────
-FROM node:22-alpine AS prod
+FROM node:26.13.0-alpine AS prod
 WORKDIR /app
 ENV NODE_ENV=production
 
-# Apenas dependências de produção
+# Apenas dependências de produção (Yarn usado só na instalação e removido em seguida)
 COPY package.json yarn.lock ./
-RUN yarn install --production --frozen-lockfile && yarn cache clean
+RUN npm install -g yarn@1.22.22 \
+    && yarn install --production --frozen-lockfile \
+    && yarn cache clean \
+    && npm uninstall -g yarn && npm cache clean --force
 
 # Código compilado
 COPY --from=builder /app/dist ./dist

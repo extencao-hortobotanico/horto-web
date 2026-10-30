@@ -1,4 +1,4 @@
-import 'dotenv/config';
+import './config/env';
 import express from 'express';
 import passport = require('./config/passport.config');
 import authRouter from './routes/auth.router';
@@ -21,6 +21,12 @@ app.use((req, res, next) => {
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Express 5 deixa req.body undefined quando a requisição não tem corpo
+app.use((req, _res, next) => {
+    req.body ??= {};
+    next();
+});
+
 app.use(passport.initialize());
 
 app.use((req, _res, next) => {
@@ -36,11 +42,16 @@ app.get('/health', (_req, res) => {
     res.status(200).json({ success: true, message: 'API funcionando', timestamp: new Date().toISOString() });
 });
 
-app.use('*', (_req, res) => {
+app.use((_req, res) => {
     res.status(404).json({ success: false, message: 'Endpoint não encontrado' });
 });
 
-app.use((error: Error, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
+app.use((error: Error & { status?: number }, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
+    // Erros do cliente gerados pelo Express (ex.: JSON malformado) mantêm o status 4xx
+    if (error.status && error.status >= 400 && error.status < 500) {
+        res.status(error.status).json({ success: false, message: 'Requisição inválida' });
+        return;
+    }
     console.error('Erro interno:', error);
     res.status(500).json({ success: false, message: 'Erro interno do servidor' });
 });
