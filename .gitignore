@@ -1,0 +1,17 @@
+# Variáveis de ambiente
+.env
+.env.local
+.env.*.local
+
+# Dependências e builds (cada projeto também tem o seu .gitignore)
+node_modules/
+dist/
+
+# IDE / SO
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Documento do projeto de extensão (mantido apenas localmente)
+Projeto de Extens*.pdf

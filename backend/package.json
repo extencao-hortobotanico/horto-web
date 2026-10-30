@@ -1,0 +1,39 @@
+{
+    "name": "horto-web-backend",
+    "version": "1.0.0",
+    "description": "API do sistema de gestão digital para hortos botânicos",
+    "main": "dist/index.js",
+    "private": true,
+    "scripts": {
+        "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
+        "build": "tsc",
+        "start": "node dist/index.js",
+        "migrate": "ts-node --transpile-only src/db/migrate.ts",
+        "migrate:prod": "node dist/db/migrate.js"
+    },
+    "license": "ISC",
+    "type": "commonjs",
+    "dependencies": {
+        "bcryptjs": "^3.0.2",
+        "dotenv": "^16.5.0",
+        "express": "^4.21.2",
+        "jsonwebtoken": "^9.0.2",
+        "passport": "^0.7.0",
+        "passport-jwt": "^4.0.1",
+        "pg-promise": "^11.14.0"
+    },
+    "devDependencies": {
+        "@types/express": "^4.17.21",
+        "@types/jsonwebtoken": "^9.0.10",
+        "@types/node": "^22.15.0",
+        "@types/passport": "^1.0.17",
+        "@types/passport-jwt": "^4.0.1",
+        "ts-node": "^10.9.2",
+        "ts-node-dev": "^2.0.0",
+        "typescript": "^5.8.3"
+    },
+    "resolutions": {
+        "@types/express": "^4.17.21",
+        "@types/express-serve-static-core": "^4.17.33"
+    }
+}

@@ -1,0 +1,30 @@
+# Ignore dependencies
+node_modules/
+dist/
+build/
+*.log
+
+# Ignore environment files
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Build output
+dist/
+build/
+
+# Vite
+.vite/
+
+# OS
+Thumbs.db
+
+package-lock.json

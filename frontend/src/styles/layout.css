@@ -1,0 +1,101 @@
+.main-content {
+    padding-top: 56px; /* altura do AppHeader fixo */
+    min-height: 100vh;
+    background: var(--bg);
+}
+
+/* Área de conteúdo das páginas */
+.page-inner {
+    padding: 28px 32px;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+/* Título da página + ações */
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.page-subtitle {
+    color: var(--text-muted);
+    font-size: 14px;
+    margin: 4px 0 0;
+}
+
+/* Formulários de cadastro */
+.form-page {
+    max-width: 720px;
+}
+
+/* Tabela dentro de um card */
+.table-card {
+    background: var(--card);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-card);
+    overflow: hidden;
+}
+
+.table-card .table {
+    margin-bottom: 0;
+}
+
+/* Lista de dados (rótulo / valor) */
+.dados-lista {
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    gap: 10px 20px;
+    margin: 0;
+    font-size: 14px;
+}
+
+.dados-lista dt {
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+.dados-lista dd {
+    margin: 0;
+}
+
+/* Cards de módulos na página inicial */
+.modulo-card .card-body {
+    padding: 20px;
+}
+
+.modulo-icone {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: var(--primary-soft);
+    color: var(--primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    margin-bottom: 12px;
+}
+
+/* Página não encontrada */
+.not-found {
+    text-align: center;
+    padding: 60px 16px;
+}
+
+.not-found h1 {
+    margin-bottom: 8px;
+}
+
+.not-found-icon {
+    color: var(--primary);
+}
+
+@media (max-width: 768px) {
+    .page-inner {
+        padding: 20px 16px;
+    }
+}

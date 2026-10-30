@@ -1,0 +1,67 @@
+# Ambiente de desenvolvimento com hot reload: banco + API (ts-node-dev) + frontend (Vite)
+#   docker compose -f docker-compose.dev.yml up --build
+# Acesse http://localhost:3001
+# O código de ./backend e ./frontend é montado nos containers: salvou, recarregou.
+# Mudou o package.json? Rode novamente com --build -V para reinstalar as dependências.
+
+services:
+  db:
+    image: postgres:17
+    container_name: horto-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-horto}
+      TZ: America/Sao_Paulo
+    ports:
+      - "${DB_PORT_HOST:-5433}:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build:
+      context: ./backend
+      target: dev
+    container_name: horto-backend
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: ${POSTGRES_DB:-horto}
+      DB_USER: ${POSTGRES_USER:-postgres}
+      DB_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      JWT_SECRET: ${JWT_SECRET:-horto-dev-secret-troque-em-producao}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-8h}
+      PORT: 3002
+      TZ: America/Sao_Paulo
+    ports:
+      - "${API_PORT_HOST:-3002}:3002"
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    depends_on:
+      db:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: ./frontend
+      target: dev
+    container_name: horto-frontend
+    environment:
+      VITE_PROXY_TARGET: http://backend:3002
+    ports:
+      - "${WEB_PORT_HOST:-3001}:3001"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    depends_on:
+      - backend
+
+volumes:
+  pgdata:

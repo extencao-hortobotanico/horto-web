@@ -1,0 +1,199 @@
+/* ============================================================
+   DESIGN TOKENS
+   ============================================================ */
+:root {
+    --bg: #f4f6f3;
+    --card: #ffffff;
+    --border: #e2e8df;
+    --text: #18221a;
+    --text-muted: #5f6b61;
+    --text-light: #9aa59c;
+    --primary: #2d6a3e;
+    --primary-hover: #245633;
+    --primary-soft: #e6f1e8;
+    --header-bg: #173b22;
+    --radius: 10px;
+    --radius-sm: 6px;
+    --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.07), 0 0 0 1px rgba(0, 0, 0, 0.05);
+    --shadow-elevated: 0 4px 16px rgba(0, 0, 0, 0.1);
+
+    /* Bootstrap: cor primária usada em links, foco e componentes */
+    --bs-primary: #2d6a3e;
+    --bs-primary-rgb: 45, 106, 62;
+    --bs-link-color: #2d6a3e;
+    --bs-link-color-rgb: 45, 106, 62;
+    --bs-link-hover-color: #245633;
+    --bs-link-hover-color-rgb: 36, 86, 51;
+}
+
+/* ============================================================
+   RESET
+   ============================================================ */
+*, *::before, *::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body, #root {
+    min-height: 100%;
+    width: 100%;
+}
+
+body {
+    font-family: Inter, 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+    text-decoration: none;
+}
+
+button {
+    cursor: pointer;
+}
+
+/* ============================================================
+   TYPOGRAPHY
+   ============================================================ */
+h1 { font-size: 22px; font-weight: 700; letter-spacing: -0.4px; margin: 0; }
+h2 { font-size: 18px; font-weight: 650; }
+h3 { font-size: 16px; font-weight: 600; }
+
+/* ============================================================
+   BOOTSTRAP OVERRIDES
+   ============================================================ */
+
+/* Buttons */
+.btn {
+    border-radius: var(--radius-sm);
+    font-weight: 500;
+    font-size: 13.5px;
+    transition: opacity 0.15s, transform 0.1s, background 0.15s;
+}
+
+.btn:active {
+    transform: translateY(1px);
+}
+
+.btn-primary {
+    --bs-btn-bg: var(--primary);
+    --bs-btn-border-color: var(--primary);
+    --bs-btn-hover-bg: var(--primary-hover);
+    --bs-btn-hover-border-color: var(--primary-hover);
+    --bs-btn-active-bg: var(--primary-hover);
+    --bs-btn-active-border-color: var(--primary-hover);
+    --bs-btn-disabled-bg: var(--primary);
+    --bs-btn-disabled-border-color: var(--primary);
+}
+
+.btn-outline-secondary {
+    --bs-btn-color: var(--text-muted);
+    --bs-btn-border-color: var(--border);
+    --bs-btn-hover-bg: var(--bg);
+    --bs-btn-hover-color: var(--text);
+    --bs-btn-hover-border-color: #c9d2c6;
+    --bs-btn-active-bg: var(--bg);
+    --bs-btn-active-color: var(--text);
+    --bs-btn-active-border-color: #c9d2c6;
+}
+
+/* Forms */
+.form-control,
+.form-select {
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    font-size: 14px;
+    color: var(--text);
+    transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: #8db897;
+    box-shadow: 0 0 0 3px rgba(45, 106, 62, 0.12);
+    outline: none;
+}
+
+.form-label {
+    font-size: 13.5px;
+    font-weight: 500;
+    color: #374151;
+    margin-bottom: 5px;
+}
+
+.form-text {
+    display: block;
+    font-size: 12px;
+    line-height: 1.4;
+    margin-top: 4px;
+}
+
+/* Cards */
+.card {
+    border: none;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-card);
+    background: var(--card);
+}
+
+/* Tables */
+.table {
+    font-size: 14px;
+}
+
+.table thead th {
+    background: #f8faf7;
+    font-weight: 600;
+    color: var(--text-muted);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+}
+
+.table td {
+    border-color: var(--border);
+    vertical-align: middle;
+}
+
+/* Alerts */
+.alert {
+    border-radius: var(--radius-sm);
+    border: none;
+    font-size: 14px;
+}
+
+/* Badge */
+.badge {
+    border-radius: 5px;
+    font-weight: 500;
+    font-size: 11px;
+}
+
+/* Modal */
+.modal-content {
+    border: none;
+    border-radius: 14px;
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.16);
+}
+
+.modal-title {
+    font-weight: 650;
+    font-size: 16px;
+}
+
+/* Spinner */
+.spinner-border {
+    color: var(--primary);
+}
+
+/* Toasts (abaixo do header fixo) */
+.toast-area {
+    padding: 72px 16px 16px;
+    z-index: 2100;
+}
