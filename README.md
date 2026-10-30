@@ -182,3 +182,17 @@ Todo módulo deve atender aos requisitos gerais do Quadro 8 antes do merge. O ch
 | **RF46** — Mensagens de resultado | `useToast().sucesso(...)` / `useToast().erro(mensagemErro(err, '...'))` após cada operação. |
 
 RF43 (validação de imagens) vale para todo upload; a infraestrutura é criada na issue de fotos de referência.
+
+## Fluxo de contribuição
+
+A branch `main` é protegida: ninguém além do administrador do repositório faz push direto nela.
+
+1. Escolha uma issue e atribua-a a você.
+2. Crie uma branch a partir da `main` atualizada, com o número da issue no nome:
+   ```bash
+   git checkout main && git pull
+   git checkout -b feat/1-cadastro-estufas
+   ```
+3. Faça commits pequenos e descritivos (ex.: `feat: cadastro de estufas`, `fix: ...`, `docs: ...`).
+4. Envie a branch e abra um pull request para a `main`. Preencha o template, incluindo `Closes #<número da issue>` e o checklist de requisitos gerais.
+5. O PR precisa da aprovação do code owner (@davi-marangoni) para o merge. Novos commits depois da aprovação exigem uma nova aprovação, e todas as conversas da revisão precisam estar resolvidas.
