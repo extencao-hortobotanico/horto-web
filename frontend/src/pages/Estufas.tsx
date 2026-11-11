@@ -56,8 +56,9 @@ const Estufas: React.FC = () => {
         }
     };
 
-    const areaTotal = estufas.reduce((soma, e) => soma + e.area, 0);
-    const colunas = isAdmin ? 5 : 4;
+    // Soma em centésimos para não acumular erro de ponto flutuante
+    const areaTotal = estufas.reduce((soma, e) => soma + Math.round(e.area * 100), 0) / 100;
+    const colunas = isAdmin ? 5 : 4; // a coluna de ações só existe para o administrador
 
     return (
         <>
@@ -87,7 +88,7 @@ const Estufas: React.FC = () => {
                                 <th className="text-end">Comprimento (m)</th>
                                 <th className="text-end">Largura (m)</th>
                                 <th className="text-end">Área (m²)</th>
-                                {isAdmin && <th className="text-end">Ações</th>}
+                                <AdminOnly><th className="text-end">Ações</th></AdminOnly>
                             </tr>
                         </thead>
                         <tbody>
@@ -104,7 +105,7 @@ const Estufas: React.FC = () => {
                                     <td className="text-end">{formatarNumero(e.comprimento)}</td>
                                     <td className="text-end">{formatarNumero(e.largura)}</td>
                                     <td className="text-end">{formatarNumero(e.area)}</td>
-                                    {isAdmin && (
+                                    <AdminOnly>
                                         <td className="text-end text-nowrap">
                                             <Link
                                                 to={`/estufas/${e.id}/editar`}
@@ -124,7 +125,7 @@ const Estufas: React.FC = () => {
                                                 <FontAwesomeIcon icon={faTrash} />
                                             </Button>
                                         </td>
-                                    )}
+                                    </AdminOnly>
                                 </tr>
                             ))}
                         </tbody>
@@ -133,7 +134,7 @@ const Estufas: React.FC = () => {
                                 <tr className="table-total">
                                     <td colSpan={3}>Total ({estufas.length} estufas)</td>
                                     <td className="text-end">{formatarNumero(areaTotal)}</td>
-                                    {isAdmin && <td />}
+                                    <AdminOnly><td /></AdminOnly>
                                 </tr>
                             </tfoot>
                         )}

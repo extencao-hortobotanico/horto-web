@@ -1,10 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { Alert, Button, Card, Col, Form, Row, Spinner } from 'react-bootstrap';
-import { useNavigate, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
+import CampoDecimal from '../components/CampoDecimal';
 import { useToast } from '../contexts/ToastContext';
 import { mensagemErro } from '../services/api';
 import { estufaService } from '../services/estufaService';
+import { decimalParaTexto, multiplicarDecimal, textoParaDecimal } from '../utils/decimal';
 import { formatarNumero } from '../utils/formatadores';
+
+const MEDIDA_MAX = 10000; // metros, mesmo limite da API
 
 interface FormState {
     identificacao: string;
@@ -18,29 +22,6 @@ const FORM_INICIAL: FormState = {
     largura: '',
 };
 
-const MEDIDA_MAX = 10000; // metros, mesmo limite da API
-
-/** Aceita vírgula ou ponto como separador decimal. */
-const paraNumero = (valor: string): number => Number(valor.trim().replace(',', '.'));
-
-/**
- * Mantém apenas o que forma uma medida válida enquanto o usuário digita:
- * dígitos, um único separador decimal (vírgula ou ponto) e no máximo 2 casas decimais.
- * Letras e outros caracteres (inclusive o sinal de menos) são descartados.
- */
-const sanitizarMedida = (valor: string): string => {
-    const limpo = valor.replace(/[^\d.,]/g, '');
-    const posSeparador = limpo.search(/[.,]/);
-    if (posSeparador === -1) return limpo.slice(0, 5);
-
-    const inteiro = limpo.slice(0, posSeparador).slice(0, 5);
-    const decimais = limpo.slice(posSeparador + 1).replace(/[.,]/g, '').slice(0, 2);
-    return `${inteiro}${limpo[posSeparador]}${decimais}`;
-};
-
-/** 12.5 → "12,5" para exibir no formato brasileiro ao editar. */
-const medidaParaTexto = (valor: number): string => String(valor).replace('.', ',');
-
 /** Cadastro (RF01, RF02) e edição (RF06) de estufas. */
 const EstufaForm: React.FC = () => {
     const { id } = useParams<{ id: string }>();
@@ -49,6 +30,7 @@ const EstufaForm: React.FC = () => {
     const toast = useToast();
     const [form, setForm] = useState<FormState>(FORM_INICIAL);
     const [error, setError] = useState('');
+    const [erroCarregamento, setErroCarregamento] = useState('');
     const [carregando, setCarregando] = useState(editando);
     const [salvando, setSalvando] = useState(false);
 
@@ -59,27 +41,21 @@ const EstufaForm: React.FC = () => {
                 const e = res.data.data!;
                 setForm({
                     identificacao: e.identificacao,
-                    comprimento: medidaParaTexto(e.comprimento),
-                    largura: medidaParaTexto(e.largura),
+                    comprimento: decimalParaTexto(e.comprimento),
+                    largura: decimalParaTexto(e.largura),
                 });
             })
-            .catch(err => setError(mensagemErro(err, 'Erro ao carregar estufa')))
+            .catch(err => setErroCarregamento(mensagemErro(err, 'Erro ao carregar estufa')))
             .finally(() => setCarregando(false));
     }, [editando, id]);
 
-    const set = (campo: keyof FormState) =>
-        (e: React.ChangeEvent<HTMLInputElement>) =>
-            setForm(prev => ({ ...prev, [campo]: e.target.value }));
+    const set = <K extends keyof FormState>(campo: K) =>
+        (valor: FormState[K]) => setForm(prev => ({ ...prev, [campo]: valor }));
 
-    const setMedida = (campo: 'comprimento' | 'largura') =>
-        (e: React.ChangeEvent<HTMLInputElement>) =>
-            setForm(prev => ({ ...prev, [campo]: sanitizarMedida(e.target.value) }));
-
-    // RF01: prévia da área; o valor definitivo é calculado pelo banco
-    const comprimento = paraNumero(form.comprimento);
-    const largura = paraNumero(form.largura);
-    const areaValida = form.comprimento !== '' && form.largura !== '' && comprimento > 0 && largura > 0;
-    const area = areaValida ? comprimento * largura : null;
+    // RF01: prévia da área com o mesmo arredondamento do banco
+    const comprimento = textoParaDecimal(form.comprimento);
+    const largura = textoParaDecimal(form.largura);
+    const area = comprimento > 0 && largura > 0 ? multiplicarDecimal(comprimento, largura) : null;
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -91,6 +67,10 @@ const EstufaForm: React.FC = () => {
         }
         if (comprimento > MEDIDA_MAX || largura > MEDIDA_MAX) {
             setError(`Comprimento e largura devem ser de no máximo ${MEDIDA_MAX.toLocaleString('pt-BR')} metros`);
+            return;
+        }
+        if (!area) {
+            setError('A área da estufa (comprimento × largura) deve ser de pelo menos 0,01 m²');
             return;
         }
 
@@ -116,6 +96,19 @@ const EstufaForm: React.FC = () => {
         return <div className="text-center py-5"><Spinner animation="border" /></div>;
     }
 
+    // Estufa inexistente ou excluída: não exibe um formulário que só resultaria em outro erro
+    if (erroCarregamento) {
+        return (
+            <div className="form-page">
+                <div className="page-header">
+                    <h1>Editar estufa</h1>
+                </div>
+                <Alert variant="danger">{erroCarregamento}</Alert>
+                <Link to="/estufas" className="btn btn-outline-secondary">Voltar para estufas</Link>
+            </div>
+        );
+    }
+
     return (
         <div className="form-page">
             <div className="page-header">
@@ -131,7 +124,7 @@ const EstufaForm: React.FC = () => {
                             <Form.Label>Identificação *</Form.Label>
                             <Form.Control
                                 value={form.identificacao}
-                                onChange={set('identificacao')}
+                                onChange={e => set('identificacao')(e.target.value)}
                                 placeholder="ex.: Estufa 1"
                                 maxLength={100}
                                 required
@@ -142,12 +135,10 @@ const EstufaForm: React.FC = () => {
                             <Col md={6}>
                                 <Form.Group className="mb-3" controlId="comprimento">
                                     <Form.Label>Comprimento (m) *</Form.Label>
-                                    <Form.Control
-                                        type="text"
-                                        inputMode="decimal"
-                                        autoComplete="off"
+                                    <CampoDecimal
                                         value={form.comprimento}
-                                        onChange={setMedida('comprimento')}
+                                        onChange={set('comprimento')}
+                                        digitosInteiros={5}
                                         placeholder="ex.: 12,50"
                                         required
                                     />
@@ -156,12 +147,10 @@ const EstufaForm: React.FC = () => {
                             <Col md={6}>
                                 <Form.Group className="mb-3" controlId="largura">
                                     <Form.Label>Largura (m) *</Form.Label>
-                                    <Form.Control
-                                        type="text"
-                                        inputMode="decimal"
-                                        autoComplete="off"
+                                    <CampoDecimal
                                         value={form.largura}
-                                        onChange={setMedida('largura')}
+                                        onChange={set('largura')}
+                                        digitosInteiros={5}
                                         placeholder="ex.: 8,40"
                                         required
                                     />

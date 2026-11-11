@@ -1,5 +1,9 @@
 -- V2: estufas (RF01, RF02, RF06, RF07)
 
+-- Ordenação natural para listagens por nome: "Estufa 2" antes de "Estufa 10", sem diferenciar
+-- maiúsculas/acentos no desempate. Uso: ORDER BY <coluna> COLLATE ordem_natural
+CREATE COLLATION IF NOT EXISTS public.ordem_natural (provider = icu, locale = 'pt-BR-u-kn');
+
 CREATE TABLE IF NOT EXISTS public.estu_estufa (
     estu_id            SERIAL        PRIMARY KEY,
     estu_identificacao VARCHAR(100)  NOT NULL,                       -- ex.: "Estufa 1"
@@ -12,6 +16,8 @@ CREATE TABLE IF NOT EXISTS public.estu_estufa (
     -- RF02: sem limite de plantas; apenas as medidas são obrigatórias e positivas
     CONSTRAINT estu_comprimento_ck   CHECK (estu_comprimento > 0),
     CONSTRAINT estu_largura_ck       CHECK (estu_largura > 0),
+    -- Medidas positivas ainda podem gerar área 0,00 após o arredondamento (ex.: 0,05 × 0,05)
+    CONSTRAINT estu_area_ck          CHECK (estu_area > 0),
     CONSTRAINT estu_identificacao_ck CHECK (BTRIM(estu_identificacao) <> '')
 );
 
