@@ -15,6 +15,7 @@ interface NavItem {
 // Novos módulos (estufas, espécies, semeaduras...) entram aqui
 const NAV_ITEMS: NavItem[] = [
     { to: '/', label: 'Início' },
+    { to: '/estufas', label: 'Estufas' },
     { to: '/usuarios', label: 'Usuários', adminOnly: true },
 ];
 

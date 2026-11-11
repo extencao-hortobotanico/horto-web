@@ -80,6 +80,44 @@
     margin-bottom: 12px;
 }
 
+.modulo-card-link {
+    transition: box-shadow 0.15s, transform 0.15s;
+}
+
+.modulo-card-link:hover {
+    box-shadow: var(--shadow-elevated);
+    transform: translateY(-1px);
+}
+
+/* Linha de total no rodapé das tabelas */
+.table-total td {
+    background: #f8faf7;
+    font-weight: 600;
+    border-bottom: none;
+}
+
+/* Prévia de valor calculado em formulários (ex.: área da estufa) */
+.area-preview {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    border-radius: var(--radius-sm);
+    background: var(--primary-soft);
+}
+
+.area-preview-label {
+    font-size: 13.5px;
+    font-weight: 500;
+    color: var(--text-muted);
+}
+
+.area-preview-valor {
+    font-size: 18px;
+    font-weight: 650;
+    color: var(--primary);
+}
+
 /* Página não encontrada */
 .not-found {
     text-align: center;

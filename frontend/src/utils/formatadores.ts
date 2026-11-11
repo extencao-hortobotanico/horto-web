@@ -5,3 +5,9 @@ export function formatarWhatsapp(numero: string | null | undefined): string {
     if (!m) return numero;
     return `+${m[1]} (${m[2]}) ${m[3]}-${m[4]}`;
 }
+
+/** 1234.5 → 1.234,50 (padrão pt-BR, 2 casas decimais) */
+export function formatarNumero(valor: number | null | undefined, casas = 2): string {
+    if (valor === null || valor === undefined || !Number.isFinite(valor)) return '—';
+    return valor.toLocaleString('pt-BR', { minimumFractionDigits: casas, maximumFractionDigits: casas });
+}

@@ -140,6 +140,18 @@ Rotas protegidas exigem o header `Authorization: Bearer <token>`, obtido no logi
 | PUT    | `/api/usuarios/:id/senha`  | `{ novaSenha }` redefine a senha |
 | PATCH  | `/api/usuarios/:id/ativo`  | `{ ativo: boolean }` ativa/desativa |
 
+### Estufas
+
+| Método | Rota                | Acesso        | Descrição |
+|--------|---------------------|---------------|-----------|
+| GET    | `/api/estufas`      | autenticado   | lista as estufas (com a área calculada) |
+| GET    | `/api/estufas/:id`  | autenticado   | detalhe |
+| POST   | `/api/estufas`      | administrador | `{ identificacao, comprimento, largura }` (metros, > 0) |
+| PUT    | `/api/estufas/:id`  | administrador | `{ identificacao, comprimento, largura }` |
+| DELETE | `/api/estufas/:id`  | administrador | exclui; bloqueada (409) se houver semeaduras ativas |
+
+A área (m²) é calculada pelo banco (`comprimento × largura`). Uma estufa sem nenhum registro vinculado é excluída de fato; se tiver histórico (ex.: semeaduras encerradas), é apenas desativada e deixa de aparecer nas listagens (RF07).
+
 `GET /health` verifica se a API está no ar.
 
 ### Perfis de acesso
