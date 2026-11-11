@@ -3,6 +3,7 @@ import express from 'express';
 import passport = require('./config/passport.config');
 import authRouter from './routes/auth.router';
 import usuarioRouter from './routes/usuario.router';
+import estufaRouter from './routes/estufa.router';
 
 const app = express();
 const PORT = process.env.PORT || 3002;
@@ -37,6 +38,7 @@ app.use((req, _res, next) => {
 // Rotas da API
 app.use('/api/auth',     authRouter);
 app.use('/api/usuarios', usuarioRouter);
+app.use('/api/estufas', estufaRouter);
 
 app.get('/health', (_req, res) => {
     res.status(200).json({ success: true, message: 'API funcionando', timestamp: new Date().toISOString() });

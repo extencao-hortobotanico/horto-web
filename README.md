@@ -106,7 +106,7 @@ cd frontend && cp .env.example .env && yarn install && yarn dev
 
 As migrations ficam em `backend/src/migration/` e são aplicadas automaticamente quando o backend sobe (tabela de controle: `schema_migrations`).
 
-- Nome do arquivo: `V<numero>_<descricao>.sql` (ex.: `V2_estufas.sql`). A ordem segue o número.
+- Nome do arquivo: `V<numero>_<descricao>.sql` (ex.: `V3_especies.sql`). A ordem segue o número.
 - Cada arquivo roda uma única vez, dentro de uma transação.
 - **Nunca edite uma migration já aplicada** — crie uma nova.
 - Convenção de nomes (herdada do ZipTick): tabelas `<prefixo>_<nome>` e colunas com o mesmo prefixo, ex.: `usua_usuario.usua_nome`. Nos `SELECT`s, use `AS` para devolver nomes simples à API (`usua_nome AS nome`).
@@ -140,6 +140,18 @@ Rotas protegidas exigem o header `Authorization: Bearer <token>`, obtido no logi
 | PUT    | `/api/usuarios/:id/senha`  | `{ novaSenha }` redefine a senha |
 | PATCH  | `/api/usuarios/:id/ativo`  | `{ ativo: boolean }` ativa/desativa |
 
+### Estufas
+
+| Método | Rota                | Acesso        | Descrição |
+|--------|---------------------|---------------|-----------|
+| GET    | `/api/estufas`      | autenticado   | lista as estufas (com a área calculada) |
+| GET    | `/api/estufas/:id`  | autenticado   | detalhe |
+| POST   | `/api/estufas`      | administrador | `{ identificacao, comprimento, largura }` (metros, > 0) |
+| PUT    | `/api/estufas/:id`  | administrador | `{ identificacao, comprimento, largura }` |
+| DELETE | `/api/estufas/:id`  | administrador | exclui; bloqueada (409) se houver semeaduras ativas |
+
+A área (m²) é calculada pelo banco (`comprimento × largura`). Uma estufa sem nenhum registro vinculado é excluída de fato; se tiver histórico (ex.: semeaduras encerradas), é apenas desativada e deixa de aparecer nas listagens (RF07).
+
 `GET /health` verifica se a API está no ar.
 
 ### Perfis de acesso
@@ -153,22 +165,49 @@ Usuários não são excluídos, apenas desativados, preservando o histórico (RF
 
 ## Como adicionar um novo módulo
 
-Exemplo: estufas.
+Exemplo: espécies. Use o módulo de **estufas** como implementação de referência: ele segue todos os padrões abaixo.
 
 **Backend**
-1. `src/migration/V2_estufas.sql` com a tabela.
-2. `src/interface/estufa.ts` com os tipos.
-3. `src/service/estufa.service.ts` com as consultas e validações. Erros de negócio: `throw new AppError('mensagem', status)`.
-4. `src/controller/estufa.controller.ts` → `try { ... } catch (error) { responderErro(res, error, 'Erro ao ...') }`. Registre alterações com `LogService.registrar(...)` (histórico de ações, RF44).
-5. `src/routes/estufa.router.ts`: leitura com `authenticate` + `authorizeAll`; escrita com `authenticate` + `authorizeAdmin`.
-6. Registre o router em `src/index.ts` (`app.use('/api/estufas', estufaRouter)`).
+1. `src/migration/V3_especies.sql` com a tabela (número combinado com o grupo).
+2. `src/interface/especie.ts` com os tipos.
+3. `src/service/especie.service.ts` com as consultas e validações. Erros de negócio: `throw new AppError('mensagem', status)`.
+4. `src/controller/especie.controller.ts` → `try { ... } catch (error) { responderErro(res, error, 'Erro ao ...') }`. Registre alterações com `LogService.registrar(...)` (histórico de ações, RF44).
+5. `src/routes/especie.router.ts`: leitura com `authenticate` + `authorizeAll`; escrita com `authenticate` + `authorizeAdmin`.
+6. Registre o router em `src/index.ts` (`app.use('/api/especies', especieRouter)`).
 
 **Frontend**
-1. Tipos em `src/types/` e chamadas em `src/services/estufaService.ts` (use a instância `api`).
+1. Tipos em `src/types/` e chamadas em `src/services/especieService.ts` (use a instância `api`).
 2. Páginas em `src/pages/` e rotas em `src/App.tsx` (formulários de cadastro dentro de `<AdminRoute>`).
-3. Botões de alteração dentro de `<AdminOnly>`.
-4. Link no menu: array `NAV_ITEMS` em `src/components/AppHeader.tsx`.
+3. Botões e colunas de alteração dentro de `<AdminOnly>`.
+4. Link no menu: array `NAV_ITEMS` em `src/components/AppHeader.tsx`, e `to` no card do módulo em `src/pages/Inicio.tsx`.
 5. Após cada operação, `useToast().sucesso(...)` / `.erro(...)` (RF46). Exclusões passam por `<ConfirmModal>` (RF45).
+
+### Padrões obrigatórios
+
+Problemas que já apareceram em revisões de código. Siga desde o início para não repetir as mesmas correções.
+
+**Números (medidas, quantidades, valores)**
+- **Backend:** valide com `validarDecimal(valor, 'Campo', { max, casas, permitirZero })` de `src/utils/validacao.ts`. Não use `Number(valor)` direto: ele aceita `"0x10"`, `"1e2"` e `[5]`. Defina `max` de forma que o valor caiba na coluna `NUMERIC`.
+- **Frontend:** use `<CampoDecimal>` (`src/components/CampoDecimal.tsx`), nunca `<Form.Control type="number">`: em alguns navegadores ele aceita letras e não tem vírgula decimal. Guarde o texto no estado e converta com `textoParaDecimal()` ao enviar; ao editar, preencha com `decimalParaTexto()`.
+- **Valores calculados** (área, totais): não multiplique ou some decimais em ponto flutuante para exibir (`0.5 * 2.01` dá `1.00499…`). Use `multiplicarDecimal()` (mesma função no back e no front), que arredonda igual ao `NUMERIC` do banco. Somas: em centésimos (`Math.round(v * 100)`).
+- **Colunas calculadas** (`GENERATED`): o arredondamento pode zerar o resultado mesmo com entradas positivas (`0,05 × 0,05 = 0,00`). Coloque `CHECK` no resultado também e valide no service com a mesma conta.
+
+**Textos**
+- Use `validarTexto(valor, 'Campo', max)`: tira espaços extras e respeita o `VARCHAR`. Mensagens no formato "Preencha o campo X" / "O campo X deve…", que não dependem do gênero da palavra.
+- Nome/identificação únicos: índice único com `LOWER(...)` (e `WHERE <prefixo>_ativo` se o registro puder ser desativado). Faça a checagem antecipada no service para a mensagem clara e traduza o erro `PG_ERRO.UNIQUE_VIOLATION` (de `src/utils/db-errors.ts`) para 409, pois duas requisições simultâneas passam pela checagem.
+- Listagens por nome: `ORDER BY <coluna> COLLATE ordem_natural` ("Estufa 2" antes de "Estufa 10"). A collation é criada na V2.
+
+**Exclusão de registros com histórico**
+- Verificação + exclusão rodam numa única transação (`db.tx`), com a linha travada (`SELECT ... FOR UPDATE`). Sem isso, um registro vinculado criado entre a verificação e o `DELETE` escapa da regra.
+- Se o registro ainda é referenciado (histórico), não apague: desative (`<prefixo>_ativo = false`). Detecte com `PG_ERRO.FOREIGN_KEY_VIOLATION` dentro de uma sub-transação (`t.tx(...)`, que vira `SAVEPOINT`), para a transação principal continuar utilizável.
+- Registros desativados somem das listagens e retornam 404 no detalhe e na edição.
+
+**Telas**
+- Formulário de edição: se o carregamento falhar (404, registro excluído), mostre só o erro e um link de volta, nunca o formulário vazio.
+- Valores calculados pelo banco aparecem como prévia no formulário, com a mesma conta do banco.
+
+**Dependências entre issues**
+- Regra que depende de um módulo ainda inexistente: implemente a estrutura completa (transação, mensagens, chamada) e deixe só a consulta como `TODO(#issue)`, com um exemplo do que deve ser feito.
 
 ### Requisitos gerais (Definition of Done)
 
@@ -176,7 +215,7 @@ Todo módulo deve atender aos requisitos gerais do Quadro 8 antes do merge. O ch
 
 | Requisito | Como atender |
 |-----------|--------------|
-| **RF42** — Validar dados obrigatórios | Validar no service com `throw new AppError('mensagem clara', 400)` e reforçar no banco com `NOT NULL` e `CHECK` (medidas e quantidades nunca negativas). No front, `required`/`min` nos campos. |
+| **RF42** — Validar dados obrigatórios | Validar no service com `validarTexto` / `validarDecimal` ou `throw new AppError('mensagem clara', 400)` e reforçar no banco com `NOT NULL` e `CHECK` (medidas e quantidades nunca negativas, inclusive em colunas calculadas). No front, `required` nos campos e `<CampoDecimal>` para números. |
 | **RF44** — Histórico de ações | `LogService.registrar({ idUsuario, acao, entidade, entidadeId, descricao, ip })` em toda operação que altera dados. |
 | **RF45** — Exclusão com confirmação | `<ConfirmModal>` antes de toda exclusão, desativação ou encerramento. |
 | **RF46** — Mensagens de resultado | `useToast().sucesso(...)` / `useToast().erro(mensagemErro(err, '...'))` após cada operação. |

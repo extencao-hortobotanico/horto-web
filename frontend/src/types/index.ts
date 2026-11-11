@@ -37,3 +37,20 @@ export interface ApiResponse<T> {
     data?: T;
     message: string;
 }
+
+export interface Estufa {
+    id: number;
+    identificacao: string;
+    comprimento: number; // metros
+    largura: number;     // metros
+    area: number;        // m², calculada pela API
+    ativo: boolean;
+    criado_em: string;
+    atualizado_em: string | null;
+}
+
+export interface EstufaInput {
+    identificacao: string;
+    comprimento: number;
+    largura: number;
+}
