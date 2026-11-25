@@ -15,6 +15,9 @@ import UsuarioForm from './pages/UsuarioForm'
 import UsuarioSenha from './pages/UsuarioSenha'
 import Estufas from './pages/Estufas'
 import EstufaForm from './pages/EstufaForm'
+import Especies from './pages/Especies'
+import EspecieDetalhe from './pages/EspecieDetalhe'
+import EspecieForm from './pages/EspecieForm'
 
 function App() {
     return (
@@ -31,6 +34,12 @@ function App() {
                 <Route path="estufas"            element={<Estufas />} />
                 <Route path="estufas/nova"       element={<AdminRoute><EstufaForm /></AdminRoute>} />
                 <Route path="estufas/:id/editar" element={<AdminRoute><EstufaForm /></AdminRoute>} />
+
+                {/* Espécies — leitura para todos, cadastro e edição para o administrador */}
+                <Route path="especies"            element={<Especies />} />
+                <Route path="especies/nova"       element={<AdminRoute><EspecieForm /></AdminRoute>} />
+                <Route path="especies/:id"        element={<EspecieDetalhe />} />
+                <Route path="especies/:id/editar" element={<AdminRoute><EspecieForm /></AdminRoute>} />
 
                 {/* Usuários — Administrador */}
                 <Route path="usuarios"            element={<AdminRoute><Usuarios /></AdminRoute>} />

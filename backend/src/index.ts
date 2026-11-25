@@ -4,6 +4,7 @@ import passport = require('./config/passport.config');
 import authRouter from './routes/auth.router';
 import usuarioRouter from './routes/usuario.router';
 import estufaRouter from './routes/estufa.router';
+import especieRouter from './routes/especie.router';
 
 const app = express();
 const PORT = process.env.PORT || 3002;
@@ -39,6 +40,7 @@ app.use((req, _res, next) => {
 app.use('/api/auth',     authRouter);
 app.use('/api/usuarios', usuarioRouter);
 app.use('/api/estufas', estufaRouter);
+app.use('/api/especies', especieRouter);
 
 app.get('/health', (_req, res) => {
     res.status(200).json({ success: true, message: 'API funcionando', timestamp: new Date().toISOString() });

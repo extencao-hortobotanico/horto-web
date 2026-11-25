@@ -17,7 +17,7 @@ interface Modulo {
 // Módulos previstos no projeto; cada um vira um link quando for implementado
 const MODULOS: Modulo[] = [
     { titulo: 'Estufas', descricao: 'Cadastro de estufas e plantas em cada uma.', icone: faWarehouse, to: '/estufas' },
-    { titulo: 'Espécies', descricao: 'Período de cultivo, procedimentos e fotos de referência.', icone: faLeaf },
+    { titulo: 'Espécies', descricao: 'Período de cultivo, procedimentos e fotos de referência.', icone: faLeaf, to: '/especies' },
     { titulo: 'Semeaduras', descricao: 'Plantios, quantidades, movimentações e condição.', icone: faSeedling },
     { titulo: 'Inventário', descricao: 'Sementes, adubos, ferramentas e equipamentos.', icone: faBoxesStacked },
     { titulo: 'Solicitações', descricao: 'Aprovação das alterações enviadas pelo bot.', icone: faClipboardCheck },
