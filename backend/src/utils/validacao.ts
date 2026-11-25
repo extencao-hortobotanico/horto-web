@@ -60,6 +60,50 @@ export function validarTexto(valor: unknown, campo: string, max: number): string
 }
 
 /**
+ * Valida um texto curto opcional (ex.: VARCHAR não obrigatório).
+ * Mesmas regras de validarTexto, mas devolve null quando o campo vem vazio ou ausente.
+ */
+export function validarTextoOpcional(valor: unknown, campo: string, max: number): string | null {
+    if (valor === undefined || valor === null) return null;
+    if (typeof valor !== 'string') throw new AppError(`O campo ${campo} deve ser um texto`);
+    if (!valor.trim()) return null;
+    return validarTexto(valor, campo, max);
+}
+
+export interface OpcoesTextoLongo {
+    /** Tamanho máximo (igual ao CHECK da coluna TEXT). */
+    max: number;
+    /** false devolve null quando vazio. Padrão: true. */
+    obrigatorio?: boolean;
+}
+
+/**
+ * Valida um texto longo de várias linhas (observações, instruções): remove espaços nas pontas
+ * e linhas em branco repetidas, mas preserva as quebras de linha, ao contrário de validarTexto.
+ */
+export function validarTextoLongo(valor: unknown, campo: string, opcoes: { max: number; obrigatorio?: true }): string;
+export function validarTextoLongo(valor: unknown, campo: string, opcoes: OpcoesTextoLongo): string | null;
+export function validarTextoLongo(valor: unknown, campo: string, opcoes: OpcoesTextoLongo): string | null {
+    const { max, obrigatorio = true } = opcoes;
+
+    if (valor !== undefined && valor !== null && typeof valor !== 'string') {
+        throw new AppError(`O campo ${campo} deve ser um texto`);
+    }
+    const texto = (valor ?? '')
+        .replace(/\r\n?/g, '\n')
+        .split('\n').map(linha => linha.trimEnd()).join('\n')
+        .replace(/\n{3,}/g, '\n\n')
+        .trim();
+
+    if (!texto) {
+        if (obrigatorio) throw new AppError(`Preencha o campo ${campo}`);
+        return null;
+    }
+    if (texto.length > max) throw new AppError(`O campo ${campo} deve ter no máximo ${max} caracteres`);
+    return texto;
+}
+
+/**
  * Produto de dois decimais arredondado como o PostgreSQL faz em NUMERIC(x, casas):
  * a conta é feita em inteiros para evitar erros de ponto flutuante (0.5 × 2.01 = 1.005 → 1.01).
  * O frontend tem a mesma função em src/utils/decimal.ts; mantenha as duas iguais.

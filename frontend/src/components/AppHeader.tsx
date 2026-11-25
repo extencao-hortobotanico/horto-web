@@ -16,6 +16,7 @@ interface NavItem {
 const NAV_ITEMS: NavItem[] = [
     { to: '/', label: 'Início' },
     { to: '/estufas', label: 'Estufas' },
+    { to: '/especies', label: 'Espécies' },
     { to: '/usuarios', label: 'Usuários', adminOnly: true },
 ];
 
