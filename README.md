@@ -152,6 +152,21 @@ Rotas protegidas exigem o header `Authorization: Bearer <token>`, obtido no logi
 
 A área (m²) é calculada pelo banco (`comprimento × largura`). Uma estufa sem nenhum registro vinculado é excluída de fato; se tiver histórico (ex.: semeaduras encerradas), é apenas desativada e deixa de aparecer nas listagens (RF07).
 
+### Espécies
+
+| Método | Rota                 | Acesso        | Descrição |
+|--------|----------------------|---------------|-----------|
+| GET    | `/api/especies`      | autenticado   | lista as espécies ativas (com o período de cultivo) |
+| GET    | `/api/especies/:id`  | autenticado   | detalhe, com os procedimentos de cultivo |
+| POST   | `/api/especies`      | administrador | `{ nome_popular, nome_cientifico?, familia?, observacoes?, estacoes?, procedimentos? }` |
+| PUT    | `/api/especies/:id`  | administrador | mesmos campos; estações e procedimentos são substituídos pelas listas enviadas |
+| DELETE | `/api/especies/:id`  | administrador | exclui; se houver semeaduras registradas, apenas desativa (`data.resultado`: `excluida` \| `desativada`) |
+
+- `estacoes`: lista com `primavera`, `verao`, `outono`, `inverno` (RF09). As 4 estações significam "ano inteiro"; lista vazia, período não informado.
+- `procedimentos`: lista ordenada de `{ tipo, descricao }`, com `tipo` entre `semeadura`, `plantio`, `rega`, `adubacao`, `poda`, `outro` (RF11).
+- Espécies desativadas (RF15) somem das listagens e das listas de escolha, mas continuam referenciadas no histórico das semeaduras.
+- Estações do ano (hemisfério sul): use `estacaoDaData(data)` e `dentroDoPeriodo(especie, data)` de `src/utils/estacao.ts` nos alertas de período de cultivo (RF10, RF17, RFB11).
+
 `GET /health` verifica se a API está no ar.
 
 ### Perfis de acesso
@@ -194,6 +209,7 @@ Problemas que já apareceram em revisões de código. Siga desde o início para 
 
 **Textos**
 - Use `validarTexto(valor, 'Campo', max)`: tira espaços extras e respeita o `VARCHAR`. Mensagens no formato "Preencha o campo X" / "O campo X deve…", que não dependem do gênero da palavra.
+- Campos opcionais: `validarTextoOpcional(valor, 'Campo', max)` devolve `null` quando vazio (no banco, `NULL`, nunca texto vazio). Textos de várias linhas (observações, instruções): `validarTextoLongo(valor, 'Campo', { max, obrigatorio })`, que preserva as quebras de linha; exiba-os com a classe `texto-longo`.
 - Nome/identificação únicos: índice único com `LOWER(...)` (e `WHERE <prefixo>_ativo` se o registro puder ser desativado). Faça a checagem antecipada no service para a mensagem clara e traduza o erro `PG_ERRO.UNIQUE_VIOLATION` (de `src/utils/db-errors.ts`) para 409, pois duas requisições simultâneas passam pela checagem.
 - Listagens por nome: `ORDER BY <coluna> COLLATE ordem_natural` ("Estufa 2" antes de "Estufa 10"). A collation é criada na V2.
 

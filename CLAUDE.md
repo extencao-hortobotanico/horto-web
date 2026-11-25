@@ -11,8 +11,8 @@ Sistema web (Express + PostgreSQL / React + Vite) do Horto Botânico de Chapecó
 ## Regras que não podem ser esquecidas
 
 - **Reutilize os helpers** em vez de reescrever lógica:
-  - backend: `utils/validacao.ts` (`validarDecimal`, `validarTexto`, `multiplicarDecimal`), `utils/db-errors.ts` (`PG_ERRO`, `codigoErroPg`), `utils/http.ts` (`parseId`, `responderErro`, `clientIp`), `AppError`;
-  - frontend: `components/CampoDecimal.tsx`, `utils/decimal.ts`, `utils/formatadores.ts`, `AdminOnly`, `AdminRoute`, `ConfirmModal`, `useToast`, `mensagemErro`.
+  - backend: `utils/validacao.ts` (`validarDecimal`, `validarTexto`, `validarTextoOpcional`, `validarTextoLongo`, `multiplicarDecimal`), `utils/estacao.ts` (`estacaoDaData`, `dentroDoPeriodo`), `utils/db-errors.ts` (`PG_ERRO`, `codigoErroPg`), `utils/http.ts` (`parseId`, `responderErro`, `clientIp`), `AppError`;
+  - frontend: `components/CampoDecimal.tsx`, `utils/decimal.ts`, `utils/formatadores.ts` (inclui `formatarPeriodo`), `AdminOnly`, `AdminRoute`, `ConfirmModal`, `useToast`, `mensagemErro`.
 - Números nunca com `Number(valor)` direto no backend nem `type="number"` no frontend.
 - Contas com decimais exibidas na tela devem bater com o arredondamento do `NUMERIC` do banco.
 - Toda alteração de dados: validação no service + `NOT NULL`/`CHECK` no banco (RF42), `LogService.registrar` (RF44), `ConfirmModal` em exclusões (RF45), toast de resultado (RF46).
